@@ -1,79 +1,48 @@
  <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="index3.html" class="brand-link d-flex justify-content-center">
+    <a href="/dashboard" class="brand-link d-flex justify-content-center">
       <span class="brand-text font-weight-light">{{ env("APP_NAME") }}</span>
     </a>
 
     <!-- Sidebar -->
     <div class="sidebar">
-      <!-- Sidebar user panel (optional) -->
-      {{-- <div class="user-panel mt-3 pb-3 mb-3 d-flex justify-content-center">
-        <div class="info">
-          <a href="#" class="d-block">{{ auth()->user()->name }}</a>
-        </div>
-      </div> --}}
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-          <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
-          {{-- <li class="nav-item menu-open">
-            <a href="#" class="nav-link active">
-              <i class="nav-icon fas fa-tachometer-alt"></i>
-              <p>
-                Starter Pages
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
+
+          @foreach ($routes as $route)
+            @if (!$route["is_dropdown"])
               <li class="nav-item">
-                <a href="#" class="nav-link active">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Active Page</p>
+                <a href="{{ route($route["route_name"]) }}" class="nav-link {{ request()->routeIs($route["route_active"]) ? "active" : "" }}">
+                  <i class="nav-icon {{ $route["icon"] }}"></i>
+                  <p>
+                    {{ $route["label"] }}
+                  </p>
                 </a>
               </li>
-              <li class="nav-item">
+            @else
+              <li class="nav-item {{ request()->routeIs($route["route_active"]) ? "menu-open" : "" }}">
                 <a href="#" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Inactive Page</p>
+                  <i class="nav-icon {{ $route["icon"] }}"></i>
+                  <p>
+                    {{ $route["label"] }}
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
                 </a>
+                <ul class="nav nav-treeview">
+                  @foreach ($route["dropdown"] as $item)
+                    <li class="nav-item">
+                        <a href="{{ route($item["route_name"]) }}" class="nav-link {{ request()->routeIs($item["route_active"]) ? "active" : "" }}">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>{{ $item["label"] }}</p>
+                        </a>
+                    </li>
+                  @endforeach
+                </ul>
               </li>
-            </ul>
-          </li> --}}
-           <li class="nav-item">
-            <a href="{{ route("dashboard") }}" class="nav-link {{ request()->routeIs("dashboard") ? "active" : "" }}">
-              <i class="nav-icon fas fa-columns"></i>
-              <p>
-                Dashboard
-              </p>
-            </a>
-          </li>
-
-
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-table"></i>
-              <p>
-                Master Data
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Kategory</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Produk</p>
-                    </a>
-                </li>
-            </ul>
-          </li>
+            @endif
+          @endforeach
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
