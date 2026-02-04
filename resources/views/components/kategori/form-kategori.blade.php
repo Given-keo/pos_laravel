@@ -1,7 +1,7 @@
 <div>
-    <button type="button" class="btn {{ $id ? 'btn-warning btn-sm' : 'btn-primary' }}" data-toggle="modal" data-target="#formKategori{{ $id ?? '' }}">
+    <button type="button" class="btn {{ $id ? 'btn-warning btn-sm' : 'btn-primary btn-sm' }}" data-toggle="modal" data-target="#formKategori{{ $id ?? '' }}">
         @if($id)
-            <i class="fas fa-edit py-2"></i> Edit
+            <i class="fas fa-edit text-light"></i>
         @else
             <i class="fas fa-plus"></i> Tambah Produk
         @endif

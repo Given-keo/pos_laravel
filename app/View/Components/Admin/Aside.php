@@ -23,6 +23,13 @@ class Aside extends Component
                 "is_dropdown" => false
             ],
             [
+                "label" => "Users",
+                "icon" => "fas fa-users",
+                "route_name" => "users.index",
+                "route_active" => "users.*",
+                "is_dropdown" => false
+            ],
+            [
                 "label" => "Master Data",
                 "icon" => "fas fa-database",
                 "route_active" => "master-data.*",

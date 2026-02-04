@@ -42,10 +42,25 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
     <ul class="navbar-nav ml-auto">
         <li>
-            <form action="{{ route("logout") }}" method="post">
-                @csrf
-                <button type="submit" class="btn text-danger">Logout</button>
-            </form>
+          <div class="dropdown">
+            <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+              <strong class="text-capitalize">{{ auth()->user()->name }}</strong>
+            </button>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="#">
+                <form action="{{ route("logout") }}" method="post">
+                  @csrf
+                  <button type="submit" class="btn btn-sm fw-bold">Logout</button>
+                </form>
+              </a>
+              {{-- <a class="dropdown-item" href="#">
+                
+              </a> --}}
+            </div>
+          </div>
+        </li>
+        <li>
+           
         </li>
     </ul>
   </nav>

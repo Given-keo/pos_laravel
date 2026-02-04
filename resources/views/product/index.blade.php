@@ -4,12 +4,12 @@
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">Data Produk</h4>
-        </div>
-        <div class="card-body">
-            <x-alert :error="$errors->any()"/>
             <div class="d-flex justify-content-end mb-2">
                 <x-product.form-product/>
             </div>
+        </div>
+        <div class="card-body">
+            <x-alert :error="$errors->any()"/>
             <div class="table-responsive">
                 <table class="table table-sm" id="example1">
                     <thead>
@@ -33,11 +33,17 @@
                                 <td>Rp. {{ number_format($product->harga_jual) }}</td>
                                 <td>Rp. {{ number_format($product->harga_beli_pokok) }}</td>
                                 <td>{{ number_format($product->stok) }}</td>
-                                <td>{{ $product->is_active }}</td>
                                 <td>
-                                    <div class="mt-2 d-flex align-items-center">
+                                    @if($product->is_active)
+                                        <span class="badge bg-success">Aktif</span>
+                                    @else
+                                        <span class="badge bg-danger">Tidak Aktif</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
                                         <x-product.form-product :id="$product->id"/>
-                                        <a href="{{ route("master-data.product.destroy", $product->id) }}" data-confirm-delete="true" class="text-white btn btn-danger mx-1">
+                                        <a href="{{ route("master-data.product.destroy", $product->id) }}" data-confirm-delete="true" class="text-light btn btn-sm btn-danger mx-1">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>

@@ -1,11 +1,11 @@
 @extends("layouts.app")
-@section("content_title","Data Kategori")
+@section("content_title","Data Admin")
 @section("content")
     <div class="card">
         <div class="card-header">
-            <h4 class="card-title">Data Kategori</h4>
-            <div class="d-flex justify-content-end">
-                <x-kategori.form-kategori/>
+            <h4 class="card-title">Data Users</h4>
+            <div class="d-flex justify-content-end mb-2">
+                <x-users.form-users/>
             </div>
         </div>
         <div class="card-body">
@@ -15,21 +15,21 @@
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Nama Kategori</th>
-                            <th>Deskripsi</th>
+                            <th>Nama</th>
+                            <th>Email</th>
                             <th>Opsi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($kategori as $index => $item)
+                        @foreach ($users as $index => $user)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
-                                <td>{{ $item->nama_kategori }}</td>
-                                <td>{{ $item->deskripsi }}</td>
+                                <td>{{ $user->email }}</td>
+                                <td>{{ $user->name }}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <x-kategori.form-kategori :id="$item->id"/>
-                                        <a href="{{ route("master-data.kategori.destroy", $item->id) }}" data-confirm-delete="true" class="text-light btn btn-sm btn-danger mx-1">
+                                        <x-users.form-users :id="$user->id"/>
+                                        <a href="{{ route("users.destroy", $user->id) }}" data-confirm-delete="true" class="text-light btn btn-sm btn-danger mx-1">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
