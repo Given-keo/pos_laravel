@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\PenerimaanBarangController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -41,5 +42,10 @@ Route::middleware("auth")->group(function(){
             Route::post("/","store")->name("store");
             Route::delete("/{id}/destroy","destroy")->name("destroy");
         });
+    });
+
+    // route penerimaan barang
+    Route::prefix("penerimaan_barang")->as("penerimaan_barang.")->controller(PenerimaanBarangController::class)->group(function() {
+        Route::get("/","index")->name("index");
     });
 });
