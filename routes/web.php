@@ -18,6 +18,13 @@ Route::middleware("auth")->group(function(){
     Route::get('/dashboard',[DashboardController::class,"index"])->name("dashboard");
     Route::post('/logout',[LoginController::class,"logout"])->name("logout");
 
+    // Pastikan ini ada di dalam group middleware 'auth' jika aplikasi butuh login
+    Route::post('/penerimaan-barang/store', [ProductController::class, 'storePenerimaan'])->name('penerimaan.store');
+
+    Route::prefix("get-data")->as("get-data.")->group(function() {
+        Route::get("/produk", [ProductController::class, "getData"])->name("produk");
+        Route::get("/cek-stok-produk", [ProductController::class, "cekStok"])->name("cek-stok");
+    });
 
     // users.index
     // users.store

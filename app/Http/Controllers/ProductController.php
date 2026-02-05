@@ -6,6 +6,8 @@ use App\Models\Product;
 use App\Models\Kategori; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Exception;
 
 class ProductController extends Controller
 {
@@ -87,4 +89,78 @@ class ProductController extends Controller
         toast()->success("Data produk berhasil dihapus");
         return redirect()->route("master-data.product.index");
     }
+
+    public function getData()
+    {
+        $search = request()->query("search");
+        $query = Product::query();
+        $product = $query->where("nama_produk", "like", "%" . $search ."%")->get();  
+        return response()->json($product);
+    }
+
+    public function cekStok(Request $request)
+    {
+        $id = $request->query("id");
+
+        $product = Product::find($id);
+
+        if ($product) {
+            return response()->json($product->stok);
+        }
+        
+        return response()->json(0);
+    }
+
+    public function storePenerimaan(Request $request)
+    {
+        // 1. Validasi data
+        $request->validate([
+            'items' => 'required|array', // Harus array
+            'items.*.produk_id' => 'required|exists:products,id',
+            'items.*.qty' => 'required|numeric|min:1',
+        ]);
+
+        // 2. Mulai Database Transaction
+        // (Agar jika satu gagal, semua batal disimpan - Data Integrity)
+        DB::beginTransaction();
+
+        try {
+            $items = $request->items;
+
+            foreach ($items as $item) {
+                // Ambil Produk
+                $product = Product::lockForUpdate()->find($item['produk_id']);
+
+                // Update Stok
+                $product->stok = $product->stok + $item['qty'];
+                $product->save();
+
+                // OPSIONAL: Jika Anda punya tabel 'history_stok' atau 'penerimaan', simpan di sini
+                // HistoryStok::create([
+                //     'product_id' => $product->id,
+                //     'type' => 'in', // Masuk
+                //     'qty' => $item['qty'],
+                //     'keterangan' => 'Penerimaan Barang',
+                //     'date' => now()
+                // ]);
+            }
+
+            DB::commit(); // Simpan permanen jika tidak ada error
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Stok berhasil ditambahkan'
+            ]);
+
+        } catch (Exception $e) {
+            DB::rollback(); // Batalkan semua perubahan jika error
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+
+    }
+
 }

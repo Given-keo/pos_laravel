@@ -49,7 +49,7 @@ class Aside extends Component
             ],
             [
                 "label" => "Penerimaan Barang",
-                "icon" => "fas fa-truck",
+                "icon" => "fa fa-box-open",
                 "route_name" => "penerimaan_barang.index",
                 "route_active" => "penerimaan_barang.*",
                 "is_dropdown" => false
