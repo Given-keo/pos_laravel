@@ -1,0 +1,166 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Product;
+use App\Models\Kategori; 
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Exception;
+
+class ProductController extends Controller
+{
+    public function index()
+    {
+
+        $products = Product::all();
+        $kategori = Kategori::all();
+
+        confirmDelete("Hapus Data", "Apakah anda yakin ingin menghapus produk ini?");
+
+        return view("product.index", compact("products", "kategori"));
+    }
+
+    public function store(Request $request)
+    {
+        $id = $request->id;
+        
+        $request->validate([
+            "nama_product"      => "required|unique:products,nama_produk," . $id,
+            "harga_jual"        => "required|numeric|min:0",
+            "harga_beli_pokok"  => "required|numeric|min:0",
+            "kategori_id"       => "required|exists:kategoris,id", 
+            "stok"              => "required|numeric|min:0",
+            "stok_minimal"      => "required|numeric|min:0",
+            "is_active"         => "nullable", 
+        ], 
+        [
+            "nama_product.required"     => "Nama produk harus diisi",
+            "nama_product.unique"       => "Nama produk sudah terdaftar, gunakan nama lain",
+            "harga_jual.required"       => "Harga jual harus diisi",
+            "harga_jual.numeric"        => "Harga jual harus berupa angka",
+            "harga_jual.min"            => "Harga jual tidak boleh kurang dari 0",
+            "harga_beli_pokok.required" => "Harga beli pokok harus diisi",
+            "harga_beli_pokok.numeric"  => "Harga beli pokok harus berupa angka",
+            "harga_beli_pokok.min"      => "Harga beli pokok tidak boleh kurang dari 0",
+            "kategori_id.required"      => "Silakan pilih kategori produk",
+            "kategori_id.exists"        => "Kategori yang dipilih tidak valid",
+            "stok.required"             => "Stok awal harus diisi (isi 0 jika kosong)",
+            "stok.numeric"              => "Stok harus berupa angka",
+            "stok.min"                  => "Stok tidak boleh minus",
+            "stok_minimal.required"     => "Stok minimal harus diisi",
+            "stok_minimal.numeric"      => "Stok minimal harus berupa angka",
+            "stok_minimal.min"          => "Stok minimal tidak boleh minus",
+        ]);
+
+        $dataToSave = [
+            "nama_produk"       => $request->nama_product, 
+            "slug"              => Str::slug($request->nama_product),
+            "kategori_id"       => $request->kategori_id,
+            "harga_jual"        => $request->harga_jual,
+            "harga_beli_pokok"  => $request->harga_beli_pokok,
+            "stok"              => $request->stok,
+            "stok_minimal"      => $request->stok_minimal,
+            
+            "is_active"         => $request->has('is_active') ? 1 : 0,
+        ];
+
+        if (!$id) {
+
+            $dataToSave['sku'] = 'SKU-' . strtoupper(Str::random(6));
+        }
+
+        Product::updateOrCreate(
+            ["id" => $id], 
+            $dataToSave    
+        );
+
+        toast()->success("Data produk berhasil disimpan");
+        return redirect()->route("data-master.product.index");
+    }
+
+    public function destroy(String $id)
+    {
+        $product = Product::findOrFail($id);
+        
+        $product->delete();
+        
+        toast()->success("Data produk berhasil dihapus");
+        return redirect()->route("data-master.product.index");
+    }
+
+    public function getData()
+    {
+        $search = request()->query("search");
+        $query = Product::query();
+        $product = $query->where("nama_produk", "like", "%" . $search ."%")->get();  
+        return response()->json($product);
+    }
+
+    public function cekStok(Request $request)
+    {
+        $id = $request->query("id");
+
+        $product = Product::find($id);
+
+        if ($product) {
+            return response()->json($product->stok);
+        }
+        
+        return response()->json(0);
+    }
+
+    public function storePenerimaan(Request $request)
+    {
+        // 1. Validasi data
+        $request->validate([
+            'items' => 'required|array', // Harus array
+            'items.*.produk_id' => 'required|exists:products,id',
+            'items.*.qty' => 'required|numeric|min:1',
+        ]);
+
+        // 2. Mulai Database Transaction
+        // (Agar jika satu gagal, semua batal disimpan - Data Integrity)
+        DB::beginTransaction();
+
+        try {
+            $items = $request->items;
+
+            foreach ($items as $item) {
+                // Ambil Produk
+                $product = Product::lockForUpdate()->find($item['produk_id']);
+
+                // Update Stok
+                $product->stok = $product->stok + $item['qty'];
+                $product->save();
+
+                // OPSIONAL: Jika Anda punya tabel 'history_stok' atau 'penerimaan', simpan di sini
+                // HistoryStok::create([
+                //     'product_id' => $product->id,
+                //     'type' => 'in', // Masuk
+                //     'qty' => $item['qty'],
+                //     'keterangan' => 'Penerimaan Barang',
+                //     'date' => now()
+                // ]);
+            }
+
+            DB::commit(); // Simpan permanen jika tidak ada error
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Stok berhasil ditambahkan'
+            ]);
+
+        } catch (Exception $e) {
+            DB::rollback(); // Batalkan semua perubahan jika error
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+
+    }
+
+}
