@@ -2,7 +2,7 @@
 
     <!-- Brand Logo -->
     <a href="/dashboard" class="brand-link d-flex align-items-center justify-content-center">
-      <img src="{{ asset("adminlte") }}/dist/img/brand.png" alt="" width="50" class="">
+      {{-- <img src="{{ asset("adminlte") }}/dist/img/brand.png" alt="" width="50" class=""> --}}
       <span class="brand-text fw-bold text-bold mx-2">{{ env("APP_NAME") }}</span>
     </a>
 

@@ -5,9 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Login | {{ env('APP_NAME') }}</title>
-
-  <link rel="icon" type="image/png" href="{{ asset("adminlte") }}/dist/img/brand.png">
-
+  
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome -->
@@ -33,8 +31,7 @@
   <div class="card card-outline">
     <div class="card-header text-center">
       <div class="h1">
-        <img src="{{ asset("adminlte") }}/dist/img/brand.png" alt="" width="50">
-        <h5 class="fw-bold text-bold">Cake Shop</h5>
+          <h5 class="fw-bold text-bold">POS LARAVEL</h5>
       </div>
     </div>
     <div class="card-body">
