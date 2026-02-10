@@ -61,7 +61,8 @@
                             </tbody>
                         </table>
                     </div>
-                    <button type="button" class="btn btn-primary btn-sm mt-2">
+                    {{-- Tambahkan id="tambahProduk" disini --}}
+                    <button type="button" id="tambahProduk" class="btn btn-primary btn-sm mt-2">
                         <i class="fas fa-plus"></i> Tambah Produk
                     </button>
                 </div>
